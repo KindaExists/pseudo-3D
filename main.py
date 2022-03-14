@@ -90,8 +90,8 @@ class Cube:
         pg.draw.line(self.surface, (0, 0, 255), self.edge_points[2, :2], self.edge_points[6, :2], 1)
         pg.draw.line(self.surface, (0, 0, 255), self.edge_points[3, :2], self.edge_points[7, :2], 1)
 
-        for x, y, z in self.edge_points:
-            pg.draw.circle(self.surface, _WHITE if z >= 0 else _GRAY, (x, y), point_radius)
+        for x, y, z in sorted(self.edge_points, key=lambda x:x[2]):
+            pg.draw.circle(self.surface, np.interp([z, z, z], [-10, 10], [60, 255]), (x, y), point_radius)
 
 
 def setup():
