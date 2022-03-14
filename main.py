@@ -22,21 +22,20 @@ class Cube:
         self.scale = scale
 
         # Relative to center-point
-        self.edge_points = (
-            # Top-left
-            # Top-Right
-            # Bottom-Left
-            # Bottom-Right
+        # Top-left
+        # Top-Right
+        # Bottom-Left
+        # Bottom-Right
+        self.vertices = np.array(
+            [[self.position[0] - self.scale[0] / 2, self.position[1] - self.scale[1] / 2, self.position[2] - self.scale[2] / 2],
+             [self.position[0] + self.scale[0] / 2, self.position[1] - self.scale[1] / 2, self.position[2] - self.scale[2] / 2],
+             [self.position[0] - self.scale[0] / 2, self.position[1] + self.scale[1] / 2, self.position[2] - self.scale[2] / 2],
+             [self.position[0] + self.scale[0] / 2, self.position[1] + self.scale[1] / 2, self.position[2] - self.scale[2] / 2],
 
-            np.array([[self.position[0] - self.scale[0] / 2, self.position[1] - self.scale[1] / 2, self.position[2] - self.scale[2] / 2],
-                      [self.position[0] + self.scale[0] / 2, self.position[1] - self.scale[1] / 2, self.position[2] - self.scale[2] / 2],
-                      [self.position[0] - self.scale[0] / 2, self.position[1] + self.scale[1] / 2, self.position[2] - self.scale[2] / 2],
-                      [self.position[0] + self.scale[0] / 2, self.position[1] + self.scale[1] / 2, self.position[2] - self.scale[2] / 2],
-
-                      [self.position[0] - self.scale[0] / 2, self.position[1] - self.scale[1] / 2, self.position[2] / 2 + self.scale[2] / 2],
-                      [self.position[0] + self.scale[0] / 2, self.position[1] - self.scale[1] / 2, self.position[2] / 2 + self.scale[2] / 2],
-                      [self.position[0] - self.scale[0] / 2, self.position[1] + self.scale[1] / 2, self.position[2] / 2 + self.scale[2] / 2],
-                      [self.position[0] + self.scale[0] / 2, self.position[1] + self.scale[1] / 2, self.position[2] / 2 + self.scale[2] / 2],])
+             [self.position[0] - self.scale[0] / 2, self.position[1] - self.scale[1] / 2, self.position[2] / 2 + self.scale[2] / 2],
+             [self.position[0] + self.scale[0] / 2, self.position[1] - self.scale[1] / 2, self.position[2] / 2 + self.scale[2] / 2],
+             [self.position[0] - self.scale[0] / 2, self.position[1] + self.scale[1] / 2, self.position[2] / 2 + self.scale[2] / 2],
+             [self.position[0] + self.scale[0] / 2, self.position[1] + self.scale[1] / 2, self.position[2] / 2 + self.scale[2] / 2]]
         )
 
         self.rotate_x(90 - self.rotation[0])
@@ -44,54 +43,54 @@ class Cube:
         self.rotate_z(90 - self.rotation[2])
 
     def rotate_z(self, degrees):
-        for ind, _ in enumerate(self.edge_points):
-            r_x = self.edge_points[ind, 0] - self.position[0]
-            r_y = self.edge_points[ind, 1] - self.position[1]
+        for ind, _ in enumerate(self.vertices):
+            r_x = self.vertices[ind, 0] - self.position[0]
+            r_y = self.vertices[ind, 1] - self.position[1]
             r = math.hypot(r_x, r_y)
             theta = math.atan2(r_y, r_x) + math.radians(degrees)
 
-            self.edge_points[ind, 0] = self.position[0] + r * math.cos(theta)
-            self.edge_points[ind, 1] = self.position[1] + r * math.sin(theta)
+            self.vertices[ind, 0] = self.position[0] + r * math.cos(theta)
+            self.vertices[ind, 1] = self.position[1] + r * math.sin(theta)
 
     def rotate_y(self, degrees):
-        for ind, _ in enumerate(self.edge_points):
-            r_x = self.edge_points[ind, 0] - self.position[0]
-            r_z = self.edge_points[ind, 2] - self.position[2]
+        for ind, _ in enumerate(self.vertices):
+            r_x = self.vertices[ind, 0] - self.position[0]
+            r_z = self.vertices[ind, 2] - self.position[2]
             r = math.hypot(r_x, r_z)
             theta = math.atan2(r_x, r_z) + math.radians(degrees)
 
-            self.edge_points[ind, 0] = self.position[0] + r * math.cos(theta)
-            self.edge_points[ind, 2] = self.position[2] + r * math.sin(theta)
+            self.vertices[ind, 0] = self.position[0] + r * math.cos(theta)
+            self.vertices[ind, 2] = self.position[2] + r * math.sin(theta)
 
     def rotate_x(self, degrees):
-        for ind, _ in enumerate(self.edge_points):
-            r_y = self.edge_points[ind, 1] - self.position[1]
-            r_z = self.edge_points[ind, 2] - self.position[2]
+        for ind, _ in enumerate(self.vertices):
+            r_y = self.vertices[ind, 1] - self.position[1]
+            r_z = self.vertices[ind, 2] - self.position[2]
             r = math.hypot(r_y, r_z)
             theta = math.atan2(r_y, r_z) - math.radians(degrees)
 
-            self.edge_points[ind, 1] = self.position[1] + r * math.cos(theta)
-            self.edge_points[ind, 2] = self.position[2] + r * math.sin(theta)
+            self.vertices[ind, 1] = self.position[1] + r * math.cos(theta)
+            self.vertices[ind, 2] = self.position[2] + r * math.sin(theta)
 
 
     def render_points(self, point_radius):
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[0, :2], self.edge_points[2, :2], 1)
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[2, :2], self.edge_points[3, :2], 1)
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[1, :2], self.edge_points[3, :2], 1)
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[0, :2], self.edge_points[1, :2], 1)
+        for x, y, z in sorted(self.vertices, key=lambda x:x[2]):
+            pg.draw.circle(self.surface, np.interp([z, z, z], [-10, 10], [0, 255]), (x, y), point_radius)
 
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[4, :2], self.edge_points[6, :2], 1)
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[6, :2], self.edge_points[7, :2], 1)
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[5, :2], self.edge_points[7, :2], 1)
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[4, :2], self.edge_points[5, :2], 1)
+        cube_surfaces = np.array(
+            [[0, 1, 3, 2],
+             [4, 5, 7, 6],
+             [0, 4, 6, 2],
+             [1, 5, 7, 3],
+             [0, 4, 5, 1],
+             [2, 6, 7, 3]]
+        )
 
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[0, :2], self.edge_points[4, :2], 1)
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[1, :2], self.edge_points[5, :2], 1)
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[2, :2], self.edge_points[6, :2], 1)
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[3, :2], self.edge_points[7, :2], 1)
+        surfaces = np.array([self.vertices[i] for i in [surface for surface in cube_surfaces]])
 
-        for x, y, z in sorted(self.edge_points, key=lambda x:x[2]):
-            pg.draw.circle(self.surface, np.interp([z, z, z], [-10, 10], [60, 255]), (x, y), point_radius)
+        for surface in sorted(surfaces, key=lambda x:np.mean(x, axis=0)[2]):
+            mean_z = np.mean(surface, axis=0)[2]
+            pg.draw.polygon(self.surface, np.interp([mean_z, mean_z, mean_z], [-20, 20], [0, 255]), [vertex[:2] for vertex in surface])
 
 
 def setup():
