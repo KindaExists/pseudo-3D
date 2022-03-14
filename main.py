@@ -1,5 +1,6 @@
 import pygame as pg
 import math
+import numpy as np
 
 _BLACK = (0, 0, 0)
 _DARK_GRAY = (40, 40, 40)
@@ -27,17 +28,15 @@ class Cube:
             # Bottom-Left
             # Bottom-Right
 
-            # Behind
-            [self.position[0] - self.scale[0] / 2, self.position[1] - self.scale[1] / 2, self.position[2] - self.scale[2] / 2, _GRAY],
-            [self.position[0] + self.scale[0] / 2, self.position[1] - self.scale[1] / 2, self.position[2] - self.scale[2] / 2, _GRAY],
-            [self.position[0] - self.scale[0] / 2, self.position[1] + self.scale[1] / 2, self.position[2] - self.scale[2] / 2, _GRAY],
-            [self.position[0] + self.scale[0] / 2, self.position[1] + self.scale[1] / 2, self.position[2] - self.scale[2] / 2, _GRAY],
+            np.array([[self.position[0] - self.scale[0] / 2, self.position[1] - self.scale[1] / 2, self.position[2] - self.scale[2] / 2],
+                      [self.position[0] + self.scale[0] / 2, self.position[1] - self.scale[1] / 2, self.position[2] - self.scale[2] / 2],
+                      [self.position[0] - self.scale[0] / 2, self.position[1] + self.scale[1] / 2, self.position[2] - self.scale[2] / 2],
+                      [self.position[0] + self.scale[0] / 2, self.position[1] + self.scale[1] / 2, self.position[2] - self.scale[2] / 2],
 
-            # Front
-            [self.position[0] - self.scale[0] / 2, self.position[1] - self.scale[1] / 2, self.position[2] / 2 + self.scale[2] / 2, _WHITE],
-            [self.position[0] + self.scale[0] / 2, self.position[1] - self.scale[1] / 2, self.position[2] / 2 + self.scale[2] / 2, _WHITE],
-            [self.position[0] - self.scale[0] / 2, self.position[1] + self.scale[1] / 2, self.position[2] / 2 + self.scale[2] / 2, _WHITE],
-            [self.position[0] + self.scale[0] / 2, self.position[1] + self.scale[1] / 2, self.position[2] / 2 + self.scale[2] / 2, _WHITE],
+                      [self.position[0] - self.scale[0] / 2, self.position[1] - self.scale[1] / 2, self.position[2] / 2 + self.scale[2] / 2],
+                      [self.position[0] + self.scale[0] / 2, self.position[1] - self.scale[1] / 2, self.position[2] / 2 + self.scale[2] / 2],
+                      [self.position[0] - self.scale[0] / 2, self.position[1] + self.scale[1] / 2, self.position[2] / 2 + self.scale[2] / 2],
+                      [self.position[0] + self.scale[0] / 2, self.position[1] + self.scale[1] / 2, self.position[2] / 2 + self.scale[2] / 2],])
         )
 
         self.rotate_x(90 - self.rotation[0])
@@ -46,54 +45,53 @@ class Cube:
 
     def rotate_z(self, degrees):
         for ind, _ in enumerate(self.edge_points):
-            r_x = self.edge_points[ind][0] - self.position[0]
-            r_y = self.edge_points[ind][1] - self.position[1]
+            r_x = self.edge_points[ind, 0] - self.position[0]
+            r_y = self.edge_points[ind, 1] - self.position[1]
             r = math.hypot(r_x, r_y)
-            theta = math.atan2(r_y, r_x) - math.radians(degrees)
+            theta = math.atan2(r_y, r_x) + math.radians(degrees)
 
-            self.edge_points[ind][0] = self.position[0] + r * math.cos(theta)
-            self.edge_points[ind][1] = self.position[1] + r * math.sin(theta)
+            self.edge_points[ind, 0] = self.position[0] + r * math.cos(theta)
+            self.edge_points[ind, 1] = self.position[1] + r * math.sin(theta)
 
     def rotate_y(self, degrees):
         for ind, _ in enumerate(self.edge_points):
-            r_x = self.edge_points[ind][0] - self.position[0]
-            r_z = self.edge_points[ind][2] - self.position[2]
+            r_x = self.edge_points[ind, 0] - self.position[0]
+            r_z = self.edge_points[ind, 2] - self.position[2]
             r = math.hypot(r_x, r_z)
-            theta = math.atan2(r_x, r_z) - math.radians(degrees)
+            theta = math.atan2(r_x, r_z) + math.radians(degrees)
 
-            self.edge_points[ind][0] = self.position[0] + r * math.cos(theta)
-            self.edge_points[ind][2] = self.position[2] + r * math.sin(theta)
+            self.edge_points[ind, 0] = self.position[0] + r * math.cos(theta)
+            self.edge_points[ind, 2] = self.position[2] + r * math.sin(theta)
 
     def rotate_x(self, degrees):
         for ind, _ in enumerate(self.edge_points):
-            r_y = self.edge_points[ind][1] - self.position[1]
-            r_z = self.edge_points[ind][2] - self.position[2]
+            r_y = self.edge_points[ind, 1] - self.position[1]
+            r_z = self.edge_points[ind, 2] - self.position[2]
             r = math.hypot(r_y, r_z)
             theta = math.atan2(r_y, r_z) - math.radians(degrees)
 
-            self.edge_points[ind][1] = self.position[1] + r * math.cos(theta)
-            self.edge_points[ind][2] = self.position[2] + r * math.sin(theta)
+            self.edge_points[ind, 1] = self.position[1] + r * math.cos(theta)
+            self.edge_points[ind, 2] = self.position[2] + r * math.sin(theta)
 
 
     def render_points(self, point_radius):
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[0][:2], self.edge_points[2][:2], 1)
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[2][:2], self.edge_points[3][:2], 1)
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[1][:2], self.edge_points[3][:2], 1)
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[0][:2], self.edge_points[1][:2], 1)
+        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[0, :2], self.edge_points[2, :2], 1)
+        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[2, :2], self.edge_points[3, :2], 1)
+        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[1, :2], self.edge_points[3, :2], 1)
+        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[0, :2], self.edge_points[1, :2], 1)
 
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[4][:2], self.edge_points[6][:2], 1)
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[6][:2], self.edge_points[7][:2], 1)
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[5][:2], self.edge_points[7][:2], 1)
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[4][:2], self.edge_points[5][:2], 1)
+        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[4, :2], self.edge_points[6, :2], 1)
+        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[6, :2], self.edge_points[7, :2], 1)
+        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[5, :2], self.edge_points[7, :2], 1)
+        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[4, :2], self.edge_points[5, :2], 1)
 
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[0][:2], self.edge_points[4][:2], 1)
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[1][:2], self.edge_points[5][:2], 1)
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[2][:2], self.edge_points[6][:2], 1)
-        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[3][:2], self.edge_points[7][:2], 1)
+        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[0, :2], self.edge_points[4, :2], 1)
+        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[1, :2], self.edge_points[5, :2], 1)
+        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[2, :2], self.edge_points[6, :2], 1)
+        pg.draw.line(self.surface, (0, 0, 255), self.edge_points[3, :2], self.edge_points[7, :2], 1)
 
-
-        for x, y, _, color in self.edge_points:
-            pg.draw.circle(self.surface, color, (x, y), point_radius)
+        for x, y, z in self.edge_points:
+            pg.draw.circle(self.surface, _WHITE if z >= 0 else _GRAY, (x, y), point_radius)
 
 
 def setup():
@@ -123,15 +121,22 @@ def loop(dis):
 
         dis.fill(_BLACK)
 
-        # if pg.mouse.get_pressed()[0]:
-        # pressed = pg.key.get_pressed()
-        # if pressed[pg.K_SPACE]:
-        cube = Cube(dis, _WHITE, (100, 100, 0), (x, 0, 0), (50, 50, 50))
-        cube.render_points(3)
+        pressed = pg.key.get_pressed()
+        if pressed[pg.K_w]:
+            y += 1
+        if pressed[pg.K_s]:
+            y -= 1
+        if pressed[pg.K_d]:
+            x += 1
+        if pressed[pg.K_a]:
+            x -= 1
+        if pressed[pg.K_q]:
+            z += 1
+        if pressed[pg.K_e]:
+            z -= 1
 
-        x += 1
-        y += 1
-        z += 1
+        cube = Cube(dis, _WHITE, (100, 100, 0), (x, y, z), (50, 50, 50))
+        cube.render_points(3)
 
         clock.tick(draw_speed)
 
